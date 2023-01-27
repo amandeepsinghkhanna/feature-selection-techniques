@@ -16,7 +16,11 @@ class Filter:
     def quasi_constant_filter(df, threshold=0.99):
         """
         method: quasi_constant_filter
-        descripption:
+        descripption: Removes Quasi Constant columns from the input DataFrame.
+
+        args:
+            1. df - pandas.core.DataFrame
+            2. threshold - float - [0-1]
         """
         columns_to_remove = []
         for col in df.columns:
@@ -80,7 +84,7 @@ class Filter:
         return vif_results
 
     @staticmethod
-    def pearsons_corr_filter(df, target=None, threshold=None):
+    def correlation_filter(df, target=None, threshold=None, type="pearson"):
         """
         method: pearsons_corr_filter
         description:
@@ -102,7 +106,7 @@ class Filter:
             elif x == 1:
                 return "PERFECT_CORRELATION"
 
-        coorelation_matrix = df.corr()
+        coorelation_matrix = df.corr(method=type, numeric_only=True)
 
         if target == None:
             return coorelation_matrix
@@ -137,6 +141,10 @@ class Filter:
 
     @staticmethod
     def filter_chi2(df, target):
+        """
+            method: filter_chi2
+            description:
+        """
         x_features = [c for c in df.columns if c != target]
         X = df[x_features]
         y = df[target]
@@ -151,4 +159,10 @@ class Filter:
         chi2_results["INTERPRETATION"] = chi2_results["P_VALUE"].apply(
             lambda x: "DEPENDENT_ON_TARGET" if x < 0.05 else "INDEPENDENT_FROM_TARGET"
         )
-        return chi2_results
+        return (
+            chi2_results,
+            chi2_results.loc[
+                chi2_results["INTERPRETATION"] == "INDEPENDENT_FROM_TARGET",
+                "INTERPRETATION",
+            ].to_list()
+        )
