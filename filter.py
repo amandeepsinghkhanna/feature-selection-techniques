@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.feature_selection import chi2
 from statsmodels.regression.linear_model import OLS
 
 
@@ -19,7 +20,7 @@ class Filter:
         """
         columns_to_remove = []
         for col in df.columns:
-            modal_frequency = df[col].value_counts().iloc[0]
+            modal_frequency = df[col].value_counts(normalize=True).iloc[0]
             if modal_frequency >= threshold:
                 columns_to_remove.append(col)
         if len(columns_to_remove) == 0:
@@ -127,9 +128,27 @@ class Filter:
                     | (
                         correlations["PEARSONS_CORRELATION_COEFFICIENT"]
                         < 0 & correlations["PEARSONS_CORRELATION_COEFFICIENT"]
-                        >= -threshold
+                        <= -threshold
                     ),
                     "VARIABLE_NAME",
                 ].to_list()
 
             return columns_to_remove
+
+    @staticmethod
+    def filter_chi2(df, target):
+        x_features = [c for c in df.columns if c != target]
+        X = df[x_features]
+        y = df[target]
+        chi2_results = chi2(X, y)
+        chi2_results = pd.DataFrame(
+            {
+                "FEATURE_NAMES": x_features,
+                "CHI2_STATISTIC": chi2_results[0],
+                "P_VALUE": chi2_results[0],
+            }
+        )
+        chi2_results["INTERPRETATION"] = chi2_results["P_VALUE"].apply(
+            lambda x: "DEPENDENT_ON_TARGET" if x < 0.05 else "INDEPENDENT_FROM_TARGET"
+        )
+        return chi2_results
