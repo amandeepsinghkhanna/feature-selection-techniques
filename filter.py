@@ -7,6 +7,18 @@ class Filter:
     """
     class: Filter
     description: Implementation of the filter methods for feature-selection.
+    methods:
+        1. quasi_constant_filter - Removes Quasi Constant columns (i.e., columns
+        that have one value with frequency => threshold) from the input DataFrame.
+        2. generate_missing_report - Computes missing frequency, missing % and 
+        cumulative missing % for all columns of the input DataFrame.
+        3. missing_frequency_filter - Generates the missing report for an input
+        DataFrame and returns a list of columns to be removed on the basis of the 
+        threshold for missing %.
+        4. compute_vif - Computes and tabulates the Variance Inflation Factor(VIF)
+        for all the columns in the input DataFrame.
+        5. correlation_filter
+        6. filter_chi2
     """
 
     def __init__(self):
@@ -159,9 +171,9 @@ class Filter:
         chi2_results["INTERPRETATION"] = chi2_results["P_VALUE"].apply(
             lambda x: "DEPENDENT_ON_TARGET" if x < 0.05 else "INDEPENDENT_FROM_TARGET"
         )
-        return (
-            chi2_results,
-            chi2_results.loc[
+        return dict(
+            reuslts_table = chi2_results,
+            columns_to_remove = chi2_results.loc[
                 chi2_results["INTERPRETATION"] == "INDEPENDENT_FROM_TARGET",
                 "INTERPRETATION",
             ].to_list()
