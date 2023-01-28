@@ -7,6 +7,10 @@ class Filter:
     """
     class: Filter
     description: Implementation of the filter methods for feature-selection.
+    
+    instance-variables:
+    None
+
     methods:
         1. quasi_constant_filter - Removes Quasi Constant columns (i.e., columns
         that have one value with frequency => threshold) from the input DataFrame.
@@ -32,7 +36,7 @@ class Filter:
 
         args:
             1. df - pandas.core.DataFrame
-            2. threshold - float - [0-1]
+            2. threshold - float - [0.0-1.0]
         """
         columns_to_remove = []
         for col in df.columns:
@@ -49,6 +53,9 @@ class Filter:
         """
         method: generate_missing_report
         description:
+
+        args:
+            1. df - pandas.core.DataFrame
         """
         missing_report = df.isnull().sum().reset_index()
         missing_report.columns = ["FEATURE_NAME", "MISSING_FREQUENCY"]
@@ -67,6 +74,10 @@ class Filter:
         """
         method: missing_frequency_filter
         description:
+
+        args:
+            1. df - pandas.core.DataFrame
+            2. threshold - float - [0.0-1.0]
         """
         missing_report = self.generate_missing_report(df)
         columns_to_remove = missing_report.loc[
