@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.feature_selection import chi2
 from statsmodels.regression.linear_model import OLS
@@ -7,17 +8,17 @@ class Filter:
     """
     class: Filter
     description: Implementation of the filter methods for feature-selection.
-    
+
     instance-variables:
     None
 
     methods:
         1. quasi_constant_filter - Removes Quasi Constant columns (i.e., columns
         that have one value with frequency => threshold) from the input DataFrame.
-        2. generate_missing_report - Computes missing frequency, missing % and 
+        2. generate_missing_report - Computes missing frequency, missing % and
         cumulative missing % for all columns of the input DataFrame.
         3. missing_frequency_filter - Generates the missing report for an input
-        DataFrame and returns a list of columns to be removed on the basis of the 
+        DataFrame and returns a list of columns to be removed on the basis of the
         threshold for missing %.
         4. compute_vif - Computes and tabulates the Variance Inflation Factor(VIF)
         for all the columns in the input DataFrame.
@@ -159,14 +160,13 @@ class Filter:
                     ),
                     "VARIABLE_NAME",
                 ].to_list()
-
             return columns_to_remove
 
     @staticmethod
     def filter_chi2(df, target):
         """
-            method: filter_chi2
-            description:
+        method: filter_chi2
+        description:
         """
         x_features = [c for c in df.columns if c != target]
         X = df[x_features]
@@ -183,9 +183,66 @@ class Filter:
             lambda x: "DEPENDENT_ON_TARGET" if x < 0.05 else "INDEPENDENT_FROM_TARGET"
         )
         return dict(
-            reuslts_table = chi2_results,
-            columns_to_remove = chi2_results.loc[
+            reuslts_table=chi2_results,
+            columns_to_remove=chi2_results.loc[
                 chi2_results["INTERPRETATION"] == "INDEPENDENT_FROM_TARGET",
                 "INTERPRETATION",
-            ].to_list()
+            ].to_list(),
         )
+    
+    @staticmethod
+    def fisher_score(x, y):
+        """
+        method: fisher_score
+        description:
+        """
+        class_labels, class_sizes = np.unique(y, return_counts = True)
+        mu = np.mean(x)
+        var = np.var(x)
+        inter_class = 0
+        intra_class = 0
+        for class_label_idx, class_label in enumerate(class_labels):
+            class_mu = np.mean(x[(y == class_label)])
+            class_var = np.var(x[(y == class_label)])
+            inter_class += class_sizes[class_label_idx]*((class_mu - mu)**2)
+            intra_class += (class_sizes[class_label_idx] - 1)*class_var
+        fisher_score = inter_class/intra_class
+        return fisher_score
+    
+    def fisher_score_ranking(self, df, target, cont_cols = None):
+        """
+        method: fisher_score_ranking
+        description:
+        """
+        fisher_scores = {}
+        
+        if isinstance(target, str):
+            y = df[target].copy()
+        elif isinstance(target, pd.core.Series):
+            y = target.values.copy()
+        elif isinstance(target, np.ndarray):
+            y = target.copy()
+        else:
+            raise TypeError("")
+        
+        if cont_cols == None:
+            cont_cols = list(df.select_dtypes(include="number").columns)
+        
+        for cont_col in cont_cols:
+            fisher_scores[cont_col] = self.fisher_score(
+                x = df[cont_col].values,
+                y = y
+            )
+
+        fisher_scores = (
+            pd.Series(fisher_scores, name = "FISHER_SCORE")
+            .sort_values(ascending = False)
+            .reset_index().rename(columns = {"index": "VARIABLE_NAME"})
+            .reset_index().rename(columns = {"index": "FISHER_SCORE_RANKING"})
+        )
+
+        fisher_scores["FISHER_SCORE_RANKING"] += 1
+
+        return fisher_scores
+
+     
