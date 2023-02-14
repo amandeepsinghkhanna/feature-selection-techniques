@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_selection import chi2
 from statsmodels.regression.linear_model import OLS
+from collections import Counter
 
 
 class Filter:
@@ -245,4 +246,30 @@ class Filter:
 
         return fisher_scores
 
-     
+     def gini_impurity (classes):
+         """
+         method: gini_score_filter
+         description: 
+         """
+         c = Counter(classes)
+         p_zero = c[0]/len(classes)
+         p_one = c[1]/len(classes)
+    
+         psum = p_zero ** 2 + p_one ** 2
+         gini = 1-psum
+         return gini
+    
+     def gini_split(attribute):
+         attribute_values = df[attribute].value_counts()
+         gini_A = 0 
+         for key in attribute_values.keys():
+             df_k = df[attribute][df[attribute] == key].value_counts()
+             n_k = attribute_values[key]
+             n = df.shape[0]
+             gini_A = gini_A + (( n_k / n) * gini_impurity(df_k))
+             return gini_A
+
+     gini_attiribute ={}
+     for key in df.columns:
+         gini_attiribute[key] = gini_split(key)
+         print(f'Gini for {key} is {gini_attiribute[key]:.3f}')
