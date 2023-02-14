@@ -248,6 +248,7 @@ class Filter:
 
      def gini_impurity (classes):
          """
+         contributor: Alexei Beuno H
          method: gini_score_filter
          description: 
          """
@@ -259,7 +260,7 @@ class Filter:
          gini = 1-psum
          return gini
     
-     def gini_split(attribute):
+     def gini_score(attribute):
          attribute_values = df[attribute].value_counts()
          gini_A = 0 
          for key in attribute_values.keys():
@@ -271,5 +272,5 @@ class Filter:
 
      gini_attiribute ={}
      for key in df.columns:
-         gini_attiribute[key] = gini_split(key)
+         gini_attiribute[key] = gini_score(key)
          print(f'Gini for {key} is {gini_attiribute[key]:.3f}')
