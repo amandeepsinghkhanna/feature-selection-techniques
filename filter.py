@@ -54,7 +54,7 @@ class Filter:
     def generate_missing_report(df):
         """
         method: generate_missing_report
-        description:
+        description: Generates the missing frequency and cumulative missing frequency of missing values in a dataframe.
 
         args:
             1. df - pandas.core.DataFrame
@@ -75,7 +75,7 @@ class Filter:
     def missing_frequency_filter(self, df, threshold=0.10):
         """
         method: missing_frequency_filter
-        description:
+        description: Generates the percent of missing values according to feature name in a dataframe.
 
         args:
             1. df - pandas.core.DataFrame
@@ -91,7 +91,7 @@ class Filter:
     def compute_vif(df):
         """
         method: compute_vif
-        description:
+        description: Variance Inflation Factor (VIF) is used to detect the severity of multicollinearity in regression analysis.
         """
         vif_results = {}
         for col in df.columns:
@@ -112,7 +112,7 @@ class Filter:
     def correlation_filter(df, target=None, threshold=None, type="pearson"):
         """
         method: pearsons_corr_filter
-        description:
+        description: Correlation is a statistical measurement of relationship between two variables.
         """
 
         def mapper(x):
@@ -167,7 +167,7 @@ class Filter:
     def filter_chi2(df, target):
         """
         method: filter_chi2
-        description:
+        description: Chi-square test is used to measure the difference between the observed and expected frequency of the outcomes of variables. It is mainly used for analysing such differences in categorical variables.
         """
         x_features = [c for c in df.columns if c != target]
         X = df[x_features]
@@ -195,7 +195,7 @@ class Filter:
     def fisher_score(x, y):
         """
         method: fisher_score
-        description:
+        description: 
         """
         class_labels, class_sizes = np.unique(y, return_counts = True)
         mu = np.mean(x)
@@ -213,7 +213,7 @@ class Filter:
     def fisher_score_ranking(self, df, target, cont_cols = None):
         """
         method: fisher_score_ranking
-        description:
+        description: 
         """
         fisher_scores = {}
         
