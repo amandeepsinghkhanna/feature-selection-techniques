@@ -195,7 +195,7 @@ class Filter:
     def fisher_score(x, y):
         """
         method: fisher_score
-        description: 
+        description: The main idea behind the Fisher score is to find a subset of features such that the distances between data points in different classes are as large as possible in the data space spanned by the selected features, while the distances between data sets in the same class are as small as possible.
         """
         class_labels, class_sizes = np.unique(y, return_counts = True)
         mu = np.mean(x)
@@ -213,7 +213,7 @@ class Filter:
     def fisher_score_ranking(self, df, target, cont_cols = None):
         """
         method: fisher_score_ranking
-        description: 
+        description: This is a feature ranking algorithm which ranks features according to fisher score. The larger the fisher score, the more important the feature is.
         """
         fisher_scores = {}
         
@@ -250,7 +250,7 @@ class Filter:
          """
          contributor: Alexei Beuno H
          method: gini_score_filter
-         description: 
+         description: Gini score or gini index represents the amount of inequality present in a population. It's value ranges from 0 to 1. 0 represents perfect equality while 1 represents perfect inequality.
          """
          c = Counter(classes)
          p_zero = c[0]/len(classes)
